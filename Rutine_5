@@ -1,0 +1,256 @@
+import sys
+
+def split_word(s):
+    word = []
+    imagin = 0
+    while imagin < len(s):
+        if imagin == len(s) - 1:
+            add = "_"
+        else:
+            add = ""
+        word.append(s[imagin] + add)
+        imagin += 1
+    return word
+
+def hm(mins):
+    quotient, remainder = divmod(mins, 60)
+    if len(str(quotient)) == 1:
+        aq = "0"
+    else:
+        aq = ""
+    if len(str(remainder)) == 1:
+        ar = "0"
+    else:
+        ar = ""
+    return f"{aq}{quotient}:{ar}{remainder}"
+
+def list_is_from_biggest_to_smallest(li):
+    thisv = 0
+    nextv = 1
+    while nextv < len(li):
+        if li[thisv] >= li[nextv]:
+            returnv = True
+        if li[thisv] < li[nextv]:
+            returnv = False
+            break
+        nextv += 1
+        thisv += 1
+    if nextv == len(li) or len(li) == 0:
+        returnv = True
+    return returnv
+
+def round_as_normal_and_round_up_if_less_than_one(number):
+    if number <= 1:
+        return 1
+    else:
+        return round(number)
+
+## Storing variables
+
+dri = []
+rutines = []
+rutine_names = []
+total = [[], [], []]
+colours = ["\u001b[32m", "\u001b[33m", "\u001b[36m", "\u001b[37m", "\u001b[92m", "\u001b[93m", "\u001b[96m"]
+res = "\u001b[0m"
+
+def DRUTINE(rutine_input):
+
+    ## Some variables to prevent the absense of a variable
+
+    char_n = 0
+    last_type = None
+    temp_n_storage = ""
+    last_st_h = 0
+
+    ## The loop sorting each character
+
+    rutine = [
+        [],
+        [],
+        []
+    ]
+
+    while True:
+        try:
+            ## Splitting minutes from hours
+            if rutine_input[char_n] == ":":
+                character = ":"
+            ## Finding out the type of the character
+            else:
+                try:
+                    int(rutine_input[char_n])
+                    character = "integer"
+                except ValueError:
+                    character = "string"
+            ## The actual sorting part
+            if last_type == "string" and character == "string":
+                rutine[0][-1] += rutine_input[char_n]
+            if last_type == "string" and character == "integer":
+                temp_n_storage += rutine_input[char_n]
+            if last_type == "string" and character == ":":
+                rutine[1].append(last_st_h * 60)
+            if last_type == "integer" and character == "string":
+                rutine[0].append(rutine_input[char_n])
+                rutine[1][-1] += int(temp_n_storage)
+                temp_n_storage = ""
+            if last_type == "integer" and character == "integer":
+                temp_n_storage += rutine_input[char_n]
+            if last_type == "integer" and character == ":":
+                rutine[1].append(int(temp_n_storage) * 60)
+                last_st_h = int(temp_n_storage)
+                temp_n_storage = ""
+            if last_type == ":" and character == "string":
+                rutine[0].append(rutine_input[char_n])
+                temp_n_storage = ""
+            if last_type == ":" and character == "integer":
+                temp_n_storage += rutine_input[char_n]
+            if last_type == None and character == "integer":
+                temp_n_storage += rutine_input[char_n]
+        ## Quit the loop when there are no more characters to check
+        except IndexError:
+            break
+        last_type = character
+        char_n += 1
+
+    ## Counting the minutes
+
+    nitem = 0
+    while nitem < len(rutine[1]):
+        if nitem == len(rutine[1]) - 1:
+            neste = 1440
+        if nitem < len(rutine[1]) - 1:
+            neste = rutine[1][nitem + 1]
+        rutine[2].append(neste - rutine[1][nitem])
+        nitem += 1
+
+    rutine.remove(rutine[1])
+
+    ## Merging equivilant activities
+
+    crut = [[], []]
+
+    nitem = 0
+    while nitem < len(rutine[0]):
+        if rutine[0][nitem] in crut[0]:
+            first = crut[0].index(rutine[0][nitem])
+            crut[1][first] += rutine[1][nitem]
+        else:
+            crut[0].append(rutine[0][nitem])
+            crut[1].append(rutine[1][nitem])
+        nitem += 1
+
+    rutine = crut
+
+    ## Sorting
+
+    crut = [[], []]
+    items_sorted = 0
+    while len(rutine[0]) > 0:
+        biggest_yet = 0
+        item = 0
+        while item < len(rutine[1]):
+            if rutine[1][item] > rutine[1][biggest_yet]:
+                biggest_yet = item
+            item += 1
+        crut[0].append(rutine[0][biggest_yet])
+        crut[1].append(rutine[1][biggest_yet])
+        rutine[0].pop(biggest_yet)
+        rutine[1].pop(biggest_yet)
+    
+    rutine = crut
+
+    ## Conversion to percents bit
+
+    rutine.append([])
+    for n in rutine[1]:
+        percent = n / 1440 * 100
+        if percent.is_integer():
+            rutine[2].append(int(percent))
+        else:
+            rutine[2].append(percent)
+    return rutine
+
+def PRPRS(drutine, boolean):
+    ## Output
+
+    if boolean:
+        i = 0
+        for percentage in drutine[2]:
+            print(f"{drutine[0][i]}: {percentage}%  ({hm(drutine[1][i])})")
+            i += 1
+    else:
+        i = 0
+        for percentage in total[2]:
+            print(f"{total[0][i]}: {percentage}%  ({hm(total[1][i])})")
+            i += 1
+
+def VI(porhq, drutine, boolean):
+    ## Vertical input
+
+    porhq /= 100
+    if boolean:
+        listt = drutine
+    else:
+        listt = total
+    act = 0
+    co = 0
+    for activity in listt[0]:
+        if co == 7:
+            co = 0
+        lines = 1
+        while lines <= round_as_normal_and_round_up_if_less_than_one(listt[2][act] * porhq):
+            print(colours[co] + listt[0][act] + res)
+            lines += 1
+        co += 1
+        act += 1
+
+while True:
+    com = input(">>> ")
+    if com in ("exit", "quit"):
+        sys.exit("")
+    if com in ("?", "help"):
+        print("* means unnecessary")
+        print("Commands, and after - arguments:")
+        print("  exit: stops the program")
+        print("  print: prints the percentages and durations of activities")
+        print("    number of lines used for the visual display")
+        print("    *the name of a day")
+        print("  adr: ad[d a ]d[aily ]r[utine]")
+        print("    name of the day")
+        print("    the daily rutine:")
+        print("      time(hour:minutes)activity")
+    com = com.split(" ", 1)
+    if com[0] == "print":
+        try:
+            int(com[1])
+        except ValueError:
+            pass
+        else:
+            PRPRS(False, False)
+            VI(int(com[1]), False, False)
+    if com[0] == "adr":
+        print(com)
+        remain = com.pop(1)
+        print(com)
+        remain = remain.split(" ", 1)
+        print(com)
+        com.append(remain[0])
+        com.append(remain[1])
+        print(com)
+        dri.append(com[2])
+        rutine_names.append(com[1])
+        rutines.append(DRUTINE(com[2]))
+        for activity in DRUTINE(com[2])[0]:
+            if activity in total[0]:
+                tindex = total[0].index(activity)
+                dindex = DRUTINE(com[2])[0].index(activity)
+                total[1][tindex] += DRUTINE(com[2])[1][dindex]
+                total[2][tindex] += DRUTINE(com[2])[2][dindex]
+            else:
+                tindex = DRUTINE(com[2])[0].index(activity)
+                dindex = DRUTINE(com[2])[0].index(activity)
+                total[0].append(activity)
+                total[1].append(DRUTINE(com[2])[1][dindex])
+                total[2].append(DRUTINE(com[2])[2][dindex])
+        print(total)

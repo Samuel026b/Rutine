@@ -1,0 +1,55 @@
+Day = 24
+t = []
+hm = []
+act = []
+number = int(input("Hvor mye gjorde du idag: "))
+n = 0
+for item in range(number):
+    hour = input("Time: ")
+    minute = input("Minutt: ")
+    action = input("Aktivitet: ")
+    t.append(int(hour) + int(minute) / 100 / 60 * 100)
+    hm.append(hour)
+    hm.append(minute)
+    act.append(action)
+    n += 1
+print(".")
+n = 0
+for something in range(number):
+    act[something].title()
+for action in act:
+    print(hm[n] + "." + hm[n + 1] + ": " + action)
+    n += 2
+more = int(input("Hvor mange min mer enn 24 timer: "))
+Day += more
+print(".")
+print(".")
+print(act)
+print(t)
+a = 0
+ant = len(t)
+while a < ant:
+    print(act[a])
+    print(t[a])
+    action = act[a]
+    n = act.count(action)
+    if n != 1:
+        To = True
+        act.remove(act[a])
+        n = act.index(action)
+        print(act[n])
+        print(t[n])
+        act.remove(act[n])
+        act.insert(a, action)
+        ant -= 1
+    else:
+        To = False
+    if a == ant - 1:
+        d = Day - t[a] + t[0]
+    else:
+        if To == True:
+            d = (t[a + 1] - t[a]) + (t[n + 1] - t[n])
+        else:
+            d = t[a + 1] - t[a]
+    print(act[a] + ": " + str(100 * d / Day) + "%")
+    a += 1
