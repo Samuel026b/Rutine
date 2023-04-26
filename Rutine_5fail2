@@ -1,0 +1,287 @@
+
+import sys
+rutine = []
+rutine_names = []
+colours = ["\u001b[32m", "\u001b[33m", "\u001b[36m", "\u001b[37m", "\u001b[92m", "\u001b[93m", "\u001b[96m"]
+
+def list_is_from_biggest_to_smallest(li):
+    thisv = 0
+    nextv = 1
+    while nextv < len(li):
+        if li[thisv] >= li[nextv]:
+            returnv = True
+        if li[thisv] < li[nextv]:
+            returnv = False
+            break
+        nextv += 1
+        thisv += 1
+    if nextv == len(li) or len(li) == 0:
+        returnv = True
+    return returnv
+
+def hm(mins):
+    quotient, remainder = divmod(mins, 60)
+    if len(str(quotient)) == 1:
+        aq = "0"
+    else:
+        aq = ""
+    if len(str(remainder)) == 1:
+        ar = "0"
+    else:
+        ar = ""
+    return f"{aq}{quotient}:{ar}{remainder}"
+
+def split_word(s):
+    word = []
+    imagin = 0
+    while imagin < len(s):
+        if imagin == len(s) - 1:
+            add = "_"
+        else:
+            add = ""
+        word.append(s[imagin] + add)
+        imagin += 1
+    return word
+
+def round_as_normal_and_round_up_if_less_than_one(number):
+    if number <= 1:
+        return 1
+    else:
+        return round(number)
+
+def BEFORE(integ, before):
+    char_n = 0
+    last_type = None
+    temp_n_storage = ""
+    last_st_h = 0
+    DAYS = 1
+    while True:
+        try:
+            ## Splitting minutes from hours
+            if before[char_n] == ":":
+                character = ":"
+            ## Finding out the type of the character
+            else:
+                try:
+                    int(before[char_n])
+                    character = "integer"
+                except ValueError:
+                    character = "string"
+            ## The actual sorting part
+            if last_type == "string" and character == "string":
+                rutine[integ][0][-1] += before[char_n]
+            if last_type == "string" and character == "integer":
+                temp_n_storage += before[char_n]
+            if last_type == "integer" and character == "string":
+                rutine[integ][0].append(before[char_n])
+                rutine[integ][2].append(int(temp_n_storage))
+                temp_n_storage = ""
+            if last_type == "integer" and character == "integer":
+                temp_n_storage += before[char_n]
+            if last_type == "integer" and character == ":":
+                DAYS = int(temp_n_storage) + 1
+                temp_n_storage = ""
+            if last_type == ":" and character == "integer":
+                temp_n_storage += before[char_n]
+            if last_type == None and character == "integer":
+                temp_n_storage += before[char_n]
+        ## Quit the loop when there are no more characters to check
+        except IndexError:
+            break
+        last_type = character
+        char_n += 1
+    rutine[integ].remove(rutine[integ][1])
+    nitem = 0
+    while nitem < len(rutine[integ][1]):
+        if nitem == len(rutine[integ][1]) - 1:
+            neste = minutes_in_a_day
+        if nitem < len(rutine[integ][1]) - 1:
+            neste = rutine[integ][1][nitem + 1]
+        rutine[integ][2].append(neste - rutine[integ][1][nitem])
+        nitem += 1
+    crut = [[], []]
+    nitem = 0
+    while nitem < len(rutine[integ][0]):
+        if rutine[integ][0][nitem] in crut[0]:
+            first = crut[0].index(rutine[integ][0][nitem])
+            crut[1][first] += rutine[integ][1][nitem]
+        else:
+            crut[0].append(rutine[integ][0][nitem])
+            crut[1].append(rutine[integ][1][nitem])
+        nitem += 1
+    items_sorted = 0
+    while not list_is_from_biggest_to_smallest(crut[1]):
+        biggest_yet = 0
+        item = 0
+        while item < len(crut[1]):
+            if crut[1][item] > crut[1][biggest_yet]:
+                biggest_yet = item
+            item += 1
+        move_item = crut[0].pop(biggest_yet)
+        crut[0].insert(items_sorted, move_item)
+        move_item = crut[1].pop(biggest_yet)
+        crut[1].insert(items_sorted, move_item)
+        items_sorted += 1
+    rutine[integ] = crut
+    rutine[integ].append([])
+    for n in rutine[integ][1]:
+        percent = n / minutes_in_a_day * 100 / DAYS
+        if percent.is_integer():
+            rutine[integ][2].append(int(percent))
+        else:
+            rutine[2].append(percent)
+
+def DAILY_RUTINE(integ, rutine_input):
+    char_n = 0
+    last_type = None
+    temp_n_storage = ""
+    last_st_h = 0
+    DAYS = 1
+    minutes_in_a_day = 1440
+    while True:
+        try:
+            ## Splitting minutes from hours
+            if rutine_input[char_n] == ":":
+                character = ":"
+            ## Finding out the type of the character
+            else:
+                try:
+                    int(rutine_input[char_n])
+                    character = "integer"
+                except ValueError:
+                    character = "string"
+            ## The actual sorting part
+            if last_type == "string" and character == "string":
+                rutine[integ][0][-1] += rutine_input[char_n]
+            if last_type == "string" and character == "integer":
+                temp_n_storage += rutine_input[char_n]
+            if last_type == "string" and character == ":":
+                rutine[integ][1].append(last_st_h * 60)
+            if last_type == "integer" and character == "string":
+                rutine[integ][0].append(rutine_input[char_n])
+                rutine[integ][1][-1] += int(temp_n_storage)
+                temp_n_storage = ""
+            if last_type == "integer" and character == "integer":
+                temp_n_storage += rutine_input[char_n]
+            if last_type == "integer" and character == ":":
+                rutine[integ][1].append(int(temp_n_storage) * 60)
+                last_st_h = int(temp_n_storage)
+                temp_n_storage = ""
+            if last_type == ":" and character == "string":
+                rutine[integ][0].append(rutine_input[char_n])
+                temp_n_storage = ""
+            if last_type == ":" and character == "integer":
+                temp_n_storage += rutine_input[char_n]
+            if last_type == None and character == "integer":
+                temp_n_storage += rutine_input[char_n]
+        ## Quit the loop when there are no more characters to check
+        except IndexError:
+            break
+        last_type = character
+        char_n += 1
+    rutine[integ].remove(rutine[integ][1])
+    nitem = 0
+    while nitem < len(rutine[integ][1]):
+        if nitem == len(rutine[integ][1]) - 1:
+            neste = minutes_in_a_day
+        if nitem < len(rutine[integ][1]) - 1:
+            neste = rutine[integ][1][nitem + 1]
+        rutine[integ][2].append(neste - rutine[integ][1][nitem])
+        nitem += 1
+    crut = [[], []]
+    nitem = 0
+    while nitem < len(rutine[integ][0]):
+        if rutine[integ][0][nitem] in crut[0]:
+            first = crut[0].index(rutine[integ][0][nitem])
+            crut[1][first] += rutine[integ][1][nitem]
+        else:
+            crut[0].append(rutine[integ][0][nitem])
+            crut[1].append(rutine[integ][1][nitem])
+        nitem += 1
+    items_sorted = 0
+    while not list_is_from_biggest_to_smallest(crut[1]):
+        biggest_yet = 0
+        item = 0
+        while item < len(crut[1]):
+            if crut[1][item] > crut[1][biggest_yet]:
+                biggest_yet = item
+            item += 1
+        move_item = crut[0].pop(biggest_yet)
+        crut[0].insert(items_sorted, move_item)
+        move_item = crut[1].pop(biggest_yet)
+        crut[1].insert(items_sorted, move_item)
+        items_sorted += 1
+    rutine[integ] = crut
+    rutine[integ].append([])
+    for n in rutine[integ][1]:
+        percent = n / minutes_in_a_day * 100 / DAYS
+        if percent.is_integer():
+            rutine[integ][2].append(int(percent))
+        else:
+            rutine[2].append(percent)
+
+def OUTPUT(integ):
+    i = 0
+    for percentage in rutine[2]:
+        if integ == None:
+            print(f"{FutureFeature}: {percentage}%  ({hm(FutureFeature)})")
+        else:
+            print(f"{rutine[integ][0][i]}: {percentage}%  ({hm(rutine[integ][1][i])})")
+        i += 1
+
+def VISUAL_OUTPUT(integ):
+    res = "\u001b[0m"
+    porhq = input("(% / h) ") # p[ercents ]or[ ]h[ours ]q[uestion]
+    if porhq in ("%", "%/4"):
+        porhq = 0.25
+    else:
+        porhq = 0.24
+    act = 0
+    co = -1
+    for activity in rutine[0]:
+        if co == 7:
+            co = 0
+        lines = 1
+        while lines <= round_as_normal_and_round_up_if_less_than_one(rutine[2][act] * porhq):
+            if integ == None:
+                print(colours[co] + FutureFeature + res)
+            else:
+                print(colours[co] + rutine[integ][0][act] + res)
+            lines += 1
+        co += 1
+        act += 1
+
+def GET_COM():
+    command = input(">>> ")
+    command = command.split(" ", 1)
+    return command
+
+while True:
+    com = GET_COM()
+### Future feature
+#    if com[0] == "remove":
+#        if rutine[0].count(com[1]) == False:
+#            print("No such activity")
+#        else:
+#            wanted_activity = rutine[0].index(com[1])
+#            minutes_in_a_day -= rutine[1][wanted_activity]
+#            rutine[0].pop(wanted_activity)
+#            rutine[1].pop(wanted_activity)
+#            rutine[2].pop(wanted_activity)
+    if com[0] in ("quit", "exit"):
+        sys.exit(" ")
+    if com[0] == "adr":
+        cname = com[1].split(" ", 1)
+        com.pop(1)
+        com.append(cname[0])
+        com.append(cname[1])
+        rutine_names.append(com[1])
+        rutine.append([[], [], []])
+        DAILY_RUTINE(integ=len(rutine_names) - 1, rutine_input=com[2])
+    if com[0] == "print":
+        if len(com) == 2:
+            try:
+                OUTPUT(rutine_names.index(com[1]))
+                VISUAL_OUTPUT(rutine_names.index(com[1]))
+            except ValueError:
+                print("No such day.")
